@@ -1,96 +1,166 @@
-# Family Trip Command Center
+# Europe Route Copilot MVP (AI Maps for Trips)
 
-> A Palantir-ish dashboard for a very non-Palantir problem: getting a few families to Pine Mountain Lake and Yosemite without losing the plot.
+A Europe-first AI road-trip planner and interactive route companion.
 
-Instead of a normal trip planner, this repo treats a long weekend like an operation: convoy routes, arrival windows, mission launches, meal logistics, family checklists, and a giant map that makes everything feel more serious than it needs to be.
+> **Positioning**: “Turn the route into part of the trip.”
 
-![Family Trip Command Center dashboard overview](docs/dashboard-overview.png)
+## Phase 1 — Repository audit (what existed)
 
-## What It Does
+### Existing architecture found
+- **Stack**: React 19 + Vite + Tailwind CSS + Google Maps JS API loader + Framer Motion + Lucide.
+- **App shape**: single large command-center shell focused on one seeded Yosemite family trip.
+- **State**: localStorage persistence via `usePersistedTripState`.
+- **Strengths to preserve**:
+  - premium dark “operations console” visual style,
+  - map-centric interaction patterns,
+  - dense, card-based information surfaces,
+  - local persistence hooks and utility helpers.
+- **Weak points for Europe MVP**:
+  - heavily hardcoded US itinerary/domain data,
+  - no Europe-first onboarding/preferences model,
+  - no structured recommendation engine layer,
+  - no clear data model for monetization or feature gating.
 
-- Tracks multiple families arriving from different cities.
-- Simulates driving routes, convoy departures, and day-by-day timeline playback.
-- Organizes the trip into itinerary, stay, meals, activities, expenses, and family views.
-- Presents the whole thing as a dark, command-center-style dashboard because that is more fun than a spreadsheet.
+## Refactor plan applied
 
-## Screens
+1. **Preserved working shell strengths** (dark dashboard feel and route/map focus).
+2. **Introduced Europe-first domain model** for users, trips, members, preferences, routes, stops, recommendations, notes, affiliate links, plans, feature flags.
+3. **Added modular service layer**:
+   - destination suggestion helper,
+   - structured recommendation engine (mocked but typed-by-shape),
+   - map provider abstraction (mock provider for MVP),
+   - affiliate provider abstraction.
+4. **Rebuilt product flow** around MVP priorities:
+   - trip setup wizard,
+   - preference onboarding,
+   - AI recommendation grouping + alternatives,
+   - interactive route map and stop save/reorder,
+   - trip dashboard + collaboration + monetization surfaces.
+5. **Kept persistence local** for fast iteration; architecture is collaborative-ready.
 
-### Mission launch overlay
+## MVP feature coverage
 
-![Mission launch overlay](docs/mission-launch.png)
+### ✅ Destination + trip setup
+- Manual destination entry.
+- AI destination suggestion action.
+- Route start/end/dates/traveler count.
+- Car mode with simple convoy-mode foundation.
 
-### Activity planning surface
+### ✅ Preference onboarding
+Collects and stores:
+- cuisines,
+- dietary restrictions,
+- activity interests,
+- budget range,
+- energy level,
+- route style (fastest/scenic/food-first),
+- must-have traits.
 
-![Activity planning screen](docs/activity-board.png)
+### ✅ AI route suggestions (mocked engine)
+Engine accepts:
+- route,
+- preferences,
+- trip context,
+- weather context.
 
-### Meal logistics surface
+Returns structured recommendations with:
+- type,
+- title,
+- short description,
+- estimated detour impact,
+- relevance score,
+- tags,
+- family-friendly,
+- dietary relevance,
+- booking/action URL slot.
 
-![Meal planning screen](docs/meals-planner.png)
+Also includes alternatives for:
+- weather changes,
+- late departure,
+- low-energy scenario.
 
-## Why This Exists
+### ✅ Interactive map
+- Route preview with provider abstraction.
+- Recommendation markers (click-to-select).
+- Save/remove/reorder stops.
+- Mode switch: fastest/scenic/food-first.
 
-Because “three families are trying to get to the same cabin” is already a systems problem.
+### ✅ Trip dashboard
+Includes:
+- route context,
+- selected stops,
+- recommendations,
+- saved hotel/activity booking surfaces,
+- trip notes,
+- collaboration list.
 
-The repo is intentionally overbuilt for a small real-life use case. That is the point. It is a fun UI experiment, a trip-planning toy, and a mildly absurd attempt to make a family weekend feel like a live operations room.
+### ✅ Sharing/collaboration
+- Invite collaborators by email (MVP local persistence).
+- Data shape is ready for realtime backend extension.
 
-## Stack
+### ✅ Monetization-ready layer
+- Freemium plan model (Free vs Pro).
+- Feature gating stubs for premium capabilities.
+- Affiliate CTA slots for hotel/activity/transport.
 
-- React 19
-- Vite
-- Google Maps JavaScript API
-- Lucide icons
-- Framer Motion
+## Data model (current MVP schema)
 
-## Running It Locally
+Defined in `src/domainModels.js`:
+- `users`
+- `trips`
+- `trip_members`
+- `traveler_preferences`
+- `trip_routes`
+- `stops`
+- `recommendations`
+- `saved_places`
+- `notes`
+- `affiliate_links`
+- `subscription_plans`
+- `feature_flags`
+
+## Environment variables
+
+Copy and edit:
 
 ```bash
-npm install
 cp .env.example .env
-npm run dev
 ```
 
-Open `http://127.0.0.1:5173` or whatever Vite prints.
-
-## Environment
-
-For the full map experience, add a browser Maps key to `.env`:
+Current variables:
 
 ```bash
 VITE_GOOGLE_MAPS_API_KEY=your_browser_maps_key_here
+# Optional custom styled map
+# VITE_GOOGLE_MAP_ID=your_google_map_id_here
 ```
 
-Optional:
+> The current MVP route map is rendered through a provider abstraction with a mock provider by default, so external map keys are optional for this implementation pass.
+
+## Run locally
 
 ```bash
-VITE_GOOGLE_MAP_ID=your_optional_google_map_id
+npm install
+npm run dev
 ```
 
-Without a key, the app still renders its UI but the live Google map layer will not fully initialize.
+## Production-readiness note (mocked vs real)
 
-## Data / Privacy
+### Mocked in this MVP
+- Recommendation intelligence is deterministic mock logic (no external AI provider yet).
+- Map/routing uses a mock provider abstraction route preview.
+- Collaboration is local-state only (no Supabase/realtime backend wired yet).
+- Affiliate providers are placeholder URLs with swap-ready abstraction.
 
-The trip data in this repo is intentionally sanitized for public sharing.
+### Production-ready foundations now in place
+- Structured recommendation output contract.
+- Feature flag + subscription plan model.
+- Affiliate link abstraction separated from trip logic.
+- Persisted trip state and modular service/domain layers for backend migration.
 
-- Family names are demo names.
-- The basecamp address is generalized.
-- Access instructions, Wi-Fi, host details, and other private trip notes are removed.
+## Key files
 
-If you publish this with your own Google Maps key, usage is billed to your Google Cloud project.
-
-## Repo Notes
-
-- State is stored locally in the browser.
-- The project is optimized for desktop and large-screen dashboard vibes.
-- The UI intentionally leans dense, dramatic, and slightly over-the-top.
-
-## If You Want To Hack On It
-
-Good places to start:
-
-- `src/App.jsx` for the main shell, timeline, and overlays
-- `src/CommandMap.jsx` for route rendering, playback, and map behavior
-- `src/tripModel.js` for the seeded trip document and helper logic
-
-## Status
-
-Built for fun. Surprisingly usable. Not pretending to be enterprise software.
+- `src/App.jsx` — Europe-first MVP product flow and UI shell.
+- `src/domainModels.js` — domain schema, plans, feature flags, starter trip model.
+- `src/services.js` — recommendation engine, map provider, destination suggestion, affiliate provider.
+- `src/usePersistedTripState.js` — local persistence hook.
