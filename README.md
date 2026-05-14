@@ -1,166 +1,184 @@
-# Europe Route Copilot MVP (AI Maps for Trips)
+# Europe Route Copilot MVP  
+## AI Maps for Trips
 
 A Europe-first AI road-trip planner and interactive route companion.
 
-> **Positioning**: “Turn the route into part of the trip.”
+**Positioning:**  
+> Turn the route into part of the trip.
 
-## Phase 1 — Repository audit (what existed)
+This project explores how AI, maps and user preferences can improve road-trip planning by suggesting meaningful stops along a route, instead of treating travel time as dead time.
+
+The MVP focuses on route-based discovery for European trips, combining destination setup, traveler preferences, AI-assisted recommendations, map interaction and monetization-ready surfaces.
+
+---
+
+## Project Goal
+
+The goal of this MVP is to help users discover places worth visiting between point A and point B.
+
+Instead of only showing the fastest route, the product is designed to suggest:
+
+- scenic detours;
+- local restaurants;
+- villages;
+- nature spots;
+- lakes and mountains;
+- activities;
+- hotels or overnight stops;
+- family-friendly alternatives;
+- low-energy or bad-weather options.
+
+The broader vision is to create an AI travel companion that turns a normal route into a more valuable travel experience.
+
+---
+
+## My Role
+
+I used this repository as a product and technical experimentation base to explore an AI-assisted travel planning concept.
+
+My contribution focused on:
+
+- auditing the existing app structure;
+- identifying what could be reused and what needed to change;
+- repositioning the product from a hardcoded US itinerary to a Europe-first route planning MVP;
+- defining the product flow around destination setup, preferences, route suggestions and interactive map usage;
+- introducing a structured domain model for trips, users, preferences, stops, recommendations, affiliate links, plans and feature flags;
+- designing a modular service layer for recommendations, map provider abstraction and affiliate provider logic;
+- preparing the product for future integration with Google Maps, Google Places, Google Routes, AI providers, Supabase and Stripe.
+
+---
+
+## Phase 1 — Repository Audit
 
 ### Existing architecture found
-- **Stack**: React 19 + Vite + Tailwind CSS + Google Maps JS API loader + Framer Motion + Lucide.
-- **App shape**: single large command-center shell focused on one seeded Yosemite family trip.
-- **State**: localStorage persistence via `usePersistedTripState`.
-- **Strengths to preserve**:
-  - premium dark “operations console” visual style,
-  - map-centric interaction patterns,
-  - dense, card-based information surfaces,
-  - local persistence hooks and utility helpers.
-- **Weak points for Europe MVP**:
-  - heavily hardcoded US itinerary/domain data,
-  - no Europe-first onboarding/preferences model,
-  - no structured recommendation engine layer,
-  - no clear data model for monetization or feature gating.
 
-## Refactor plan applied
+- **Stack:** React 19, Vite, Tailwind CSS, Google Maps JS API loader, Framer Motion and Lucide.
+- **App shape:** single large command-center shell focused on one seeded Yosemite family trip.
+- **State:** localStorage persistence via `usePersistedTripState`.
 
-1. **Preserved working shell strengths** (dark dashboard feel and route/map focus).
-2. **Introduced Europe-first domain model** for users, trips, members, preferences, routes, stops, recommendations, notes, affiliate links, plans, feature flags.
-3. **Added modular service layer**:
-   - destination suggestion helper,
-   - structured recommendation engine (mocked but typed-by-shape),
-   - map provider abstraction (mock provider for MVP),
+### Strengths preserved
+
+- premium dark “operations console” visual style;
+- map-centric interaction patterns;
+- dense, card-based information surfaces;
+- local persistence hooks;
+- useful helper utilities.
+
+### Weak points for the Europe MVP
+
+- heavily hardcoded US itinerary and domain data;
+- no Europe-first onboarding or preference model;
+- no structured recommendation engine layer;
+- no clear data model for monetization or feature gating;
+- limited readiness for real backend or AI provider integration.
+
+---
+
+## Refactor Plan Applied
+
+1. Preserved the working shell strengths, especially the dark dashboard feel and map-first interaction.
+2. Introduced a Europe-first domain model for users, trips, members, preferences, routes, stops, recommendations, notes, affiliate links, plans and feature flags.
+3. Added a modular service layer:
+   - destination suggestion helper;
+   - structured recommendation engine;
+   - map provider abstraction;
    - affiliate provider abstraction.
-4. **Rebuilt product flow** around MVP priorities:
-   - trip setup wizard,
-   - preference onboarding,
-   - AI recommendation grouping + alternatives,
-   - interactive route map and stop save/reorder,
-   - trip dashboard + collaboration + monetization surfaces.
-5. **Kept persistence local** for fast iteration; architecture is collaborative-ready.
+4. Rebuilt the product flow around MVP priorities:
+   - trip setup wizard;
+   - preference onboarding;
+   - AI recommendation grouping and alternatives;
+   - interactive route map;
+   - save/remove/reorder stops;
+   - trip dashboard;
+   - collaboration and monetization surfaces.
+5. Kept persistence local for fast iteration, while making the architecture ready for future backend migration.
 
-## MVP feature coverage
+---
 
-### ✅ Destination + trip setup
+## MVP Feature Coverage
+
+### Destination and Trip Setup
+
 - Manual destination entry.
 - AI destination suggestion action.
-- Route start/end/dates/traveler count.
+- Route start, end, dates and traveler count.
 - Car mode with simple convoy-mode foundation.
 
-### ✅ Preference onboarding
-Collects and stores:
-- cuisines,
-- dietary restrictions,
-- activity interests,
-- budget range,
-- energy level,
-- route style (fastest/scenic/food-first),
+### Preference Onboarding
+
+The MVP collects and stores:
+
+- cuisines;
+- dietary restrictions;
+- activity interests;
+- budget range;
+- energy level;
+- route style: fastest, scenic or food-first;
 - must-have traits.
 
-### ✅ AI route suggestions (mocked engine)
-Engine accepts:
-- route,
-- preferences,
-- trip context,
+### AI Route Suggestions
+
+The recommendation engine accepts:
+
+- route;
+- preferences;
+- trip context;
 - weather context.
 
-Returns structured recommendations with:
-- type,
-- title,
-- short description,
-- estimated detour impact,
-- relevance score,
-- tags,
-- family-friendly,
-- dietary relevance,
+It returns structured recommendations with:
+
+- type;
+- title;
+- short description;
+- estimated detour impact;
+- relevance score;
+- tags;
+- family-friendly flag;
+- dietary relevance;
 - booking/action URL slot.
 
-Also includes alternatives for:
-- weather changes,
-- late departure,
+It also includes alternatives for:
+
+- weather changes;
+- late departure;
 - low-energy scenario.
 
-### ✅ Interactive map
-- Route preview with provider abstraction.
-- Recommendation markers (click-to-select).
-- Save/remove/reorder stops.
-- Mode switch: fastest/scenic/food-first.
+### Interactive Map
 
-### ✅ Trip dashboard
+- Route preview with provider abstraction.
+- Recommendation markers.
+- Click-to-select interaction.
+- Save/remove/reorder stops.
+- Mode switch: fastest, scenic, food-first.
+
+### Trip Dashboard
+
 Includes:
-- route context,
-- selected stops,
-- recommendations,
-- saved hotel/activity booking surfaces,
-- trip notes,
+
+- route context;
+- selected stops;
+- recommendations;
+- saved hotel/activity booking surfaces;
+- trip notes;
 - collaboration list.
 
-### ✅ Sharing/collaboration
-- Invite collaborators by email (MVP local persistence).
-- Data shape is ready for realtime backend extension.
+### Sharing and Collaboration
 
-### ✅ Monetization-ready layer
-- Freemium plan model (Free vs Pro).
+- Invite collaborators by email.
+- MVP local persistence.
+- Data shape ready for realtime backend extension.
+
+### Monetization-Ready Layer
+
+- Freemium plan model: Free vs Pro.
 - Feature gating stubs for premium capabilities.
-- Affiliate CTA slots for hotel/activity/transport.
+- Affiliate CTA slots for hotels, activities and transport.
 
-## Data model (current MVP schema)
+---
 
-Defined in `src/domainModels.js`:
-- `users`
-- `trips`
-- `trip_members`
-- `traveler_preferences`
-- `trip_routes`
-- `stops`
-- `recommendations`
-- `saved_places`
-- `notes`
-- `affiliate_links`
-- `subscription_plans`
-- `feature_flags`
+## Data Model
 
-## Environment variables
+The current MVP schema is defined in:
 
-Copy and edit:
-
-```bash
-cp .env.example .env
-```
-
-Current variables:
-
-```bash
-VITE_GOOGLE_MAPS_API_KEY=your_browser_maps_key_here
-# Optional custom styled map
-# VITE_GOOGLE_MAP_ID=your_google_map_id_here
-```
-
-> The current MVP route map is rendered through a provider abstraction with a mock provider by default, so external map keys are optional for this implementation pass.
-
-## Run locally
-
-```bash
-npm install
-npm run dev
-```
-
-## Production-readiness note (mocked vs real)
-
-### Mocked in this MVP
-- Recommendation intelligence is deterministic mock logic (no external AI provider yet).
-- Map/routing uses a mock provider abstraction route preview.
-- Collaboration is local-state only (no Supabase/realtime backend wired yet).
-- Affiliate providers are placeholder URLs with swap-ready abstraction.
-
-### Production-ready foundations now in place
-- Structured recommendation output contract.
-- Feature flag + subscription plan model.
-- Affiliate link abstraction separated from trip logic.
-- Persisted trip state and modular service/domain layers for backend migration.
-
-## Key files
-
-- `src/App.jsx` — Europe-first MVP product flow and UI shell.
-- `src/domainModels.js` — domain schema, plans, feature flags, starter trip model.
-- `src/services.js` — recommendation engine, map provider, destination suggestion, affiliate provider.
-- `src/usePersistedTripState.js` — local persistence hook.
+```txt
+src/domainModels.js
